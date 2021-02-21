@@ -13,3 +13,6 @@ More info at http://efektalab.com/PWS102
 ---
 
 ![Wireless capacitive soil moisture mini sensor with 1.02 inch e-paper display](https://github.com/smartboxchannel/Wireless-capacitive-soil-moisture-mini-sensor-with-e-paper-display/blob/main/Images/001.jpg) 
+
+
+![Wireless capacitive soil moisture mini sensor with 1.02 inch e-paper display](https://github.com/smartboxchannel/Wireless-capacitive-soil-moisture-mini-sensor-with-e-paper-display/blob/main/Images/002.jpg) 
