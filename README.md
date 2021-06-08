@@ -6,9 +6,9 @@ Soil moisture measurement sensor project with 1.02 inch electronic ink display (
 
 #### Sale: https://www.tindie.com/products/diyberk/soil-moisture-mini-sensor-with-e-paper-display/
 
-Video: https://youtu.be/0dnzQiRZj7M
+Video1: https://youtu.be/0dnzQiRZj7M
 
-       https://youtu.be/uiuMHfAOONQ
+Video2: https://youtu.be/uiuMHfAOONQ
 
 More info at http://efektalab.com/PWS102
 
