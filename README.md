@@ -1,6 +1,6 @@
 # Wireless capacitive soil moisture mini sensor with 1.02 inch e-paper display
 
-Soil moisture measurement sensor project with 1.02 inch electronic ink display (GDEW0102T4). Very low power consumption, very small device. MINEW MS50SFA RF modules with nRF5210, nRF52811, nRF52832 and EBYTE E73 chips with nRF52833, nRF52840 chips are used
+Soil moisture measurement sensor project with 1.02 inch electronic ink display (GDEW0102T4). Very low power consumption, very small device. Built on the basis of SoC nRF5210, nRF52811, nRF52832, nRF52833, nRF52840 (EBYTE E73 and MINEW modules)
 
 #### Don't donate to me, it doesn't work in this world: https://paypal.me/efektalab , just buy:
 
