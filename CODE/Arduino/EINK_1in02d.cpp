@@ -175,7 +175,7 @@ void EPD_WaitUntilIdle2(void)
     busy = !(busy & 0x01);
   }
   while (busy);
-  EINK_Delay_ms(200);
+  EINK_Delay_ms(100);
 }
 
 
@@ -399,13 +399,13 @@ void EPD_Sleep(void)
   EPD_SendCommand(0X50);   //VCOM AND DATA INTERVAL SETTING
   EPD_WaitUntilIdle();
   EPD_SendData(0xf7);  //WBmode:VBDF 17|D7 VBDW 97 VBDB 57    WBRmode:VBDF F7 VBDW 77 VBDB 37  VBDR B7
-  EINK_Delay_ms(10);
+  //EINK_Delay_ms(10);
   EPD_SendCommand(0X02);  	//power off
   EPD_WaitUntilIdle();
   EPD_SendCommand(0X07);  	//deep sleep
-  EINK_Delay_ms(10);
+  //EINK_Delay_ms(10);
   EPD_SendData(0xA5);
-  EINK_Delay_ms(50);
+  //EINK_Delay_ms(50);
 }
 
 /*

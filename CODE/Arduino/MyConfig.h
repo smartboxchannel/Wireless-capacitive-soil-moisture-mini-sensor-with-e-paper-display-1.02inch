@@ -16,6 +16,8 @@
 //                                                                                                                          //
 // ######################################################################################################################## //
 
+
+#define ESPECIALLY
 //#define NRF840
 #define DCPOWER
 #define LANG_EN
@@ -26,5 +28,5 @@
 #define MY_NRF5_ESB_MODE (NRF5_250KBPS)
 #define MY_RESET_REASON_TEXT
 #define SN "EFEKTA MINI PWS E-Ink"
-#define SV "0.15"
+#define SV "0.18"
 #define MY_RADIO_NRF5_ESB

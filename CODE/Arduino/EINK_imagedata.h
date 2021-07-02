@@ -16,6 +16,7 @@
 //                                                                                                                          //
 // ######################################################################################################################## //
 
+extern const unsigned char Especially[];
 extern const unsigned char LOGO[1280];
 extern const unsigned char bNum0[200];
 extern const unsigned char bNum1[200];

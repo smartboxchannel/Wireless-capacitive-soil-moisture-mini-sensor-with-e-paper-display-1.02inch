@@ -63,7 +63,7 @@ uint8_t battery;
 uint8_t old_battery;
 uint8_t err_delivery_beat;
 uint8_t problem_mode_count;
-uint8_t bindSend;
+//uint8_t bindSend;
 uint8_t threshholdHum;
 
 
@@ -97,14 +97,15 @@ const uint32_t SLEEP_TIME_WDT = 10000;
 uint32_t PRECISION_TIME_WDT;
 uint32_t sleepTimeCount;
 const uint32_t shortWait = 50;
-float differenceAD;
+float differenceAD1;
+float differenceAD2;
 float batteryVoltageF;
 float filtered_m_s_m_calc;
 
 
-const uint16_t maxi = 3000; //  nom 3500, lmc555 eink
-const uint16_t nomV = 3300;
-const uint16_t mini = 2000; // nom 1800, lmc555 eink
+const uint16_t maxi = 3300; //  nom 3900, lmc555 eink on 3v3
+const uint16_t nomV = 3300; // nom voltage
+const uint16_t mini = 2100; // nom 2000, lmc555 eink on 3v3
 uint16_t differenceV;
 uint16_t maxiM;
 uint16_t miniM;
@@ -137,7 +138,7 @@ int16_t mtwr;
 #define MY_SEND_RESET_REASON 105
 #define SET_COLOR_ID 106
 #define SET_FONTS_ID 107
-#define SET_BIND_ID 108
+//#define SET_BIND_ID 108
 #define SET_THRESHOLD_HUM_ID 109
 
 #include <MySensors.h>
@@ -150,7 +151,7 @@ MyMessage setBattSendMsg(SET_BATT_SEND_ID, V_VAR1);
 MyMessage sendMsg(MY_SEND_RESET_REASON, V_VAR1);
 MyMessage setColor(SET_COLOR_ID, V_VAR1);
 MyMessage setFonts(SET_FONTS_ID, V_VAR1);
-MyMessage setBind(SET_BIND_ID, V_VAR1);
+//MyMessage setBind(SET_BIND_ID, V_VAR1);
 MyMessage setVar(BATTERY_VOLTAGE_ID, V_VAR1);
 MyMessage setThreshHum(SET_THRESHOLD_HUM_ID, V_VAR1);
 
@@ -254,7 +255,7 @@ void einkOneend() {
   EPD_Display_Image((UBYTE *)image_temp);
 }
 
-
+/*
 void einkOnePluspush() {
   wdt_nrfReset();
   paith.Clear(opposite_colorPrint);
@@ -282,7 +283,7 @@ void einkOnePlusend() {
 #endif
   EPD_Display_Image((UBYTE *)image_temp);
 }
-
+*/
 
 void einkTwopush() {
   wdt_nrfReset();
@@ -1040,7 +1041,7 @@ void reportBattInk() {
   wait(2000);
 }
 
-
+/*
 void reportBindInk() {
   wdt_nrfReset();
   EPD_Clear2();
@@ -1054,7 +1055,7 @@ void reportBindInk() {
   EPD_Display_Image((UBYTE *)image_temp);
   wait(2000);
 }
-
+*/
 
 void display_Table()
 {
@@ -1635,22 +1636,18 @@ void DrawImageWH(Paint * paith, int x, int y, const unsigned char* imgData, int 
 
 
 void readBatt() {
+  wait(shortWait * 5);
   batteryVoltage = hwCPUVoltage();                            // Read internal voltage from mcu
-  //send(setVar.set(batteryVoltage));
   if (flag_rb == false) {
     battery = battery_level_in_percent(batteryVoltage);
     if (battery > 100) {
       battery = 100;
     }
-    //if (battery != old_battery) {
-    //old_battery = battery;
     bch = true;
     change = true;
-    //}
     if (batteryVoltage != old_batteryVoltage) {
       old_batteryVoltage = batteryVoltage;
-      batteryVoltageF = (float)batteryVoltage / 1000;
-      //batteryVoltageF = (float)batteryVoltage;          // Сonversion to volts
+      batteryVoltageF = (float)batteryVoltage / 1000;  // Сonversion to volts
       vch = true;
     }
     flag_rb = true;
@@ -1663,11 +1660,8 @@ void readBatt() {
     if (battery > 100) {
       battery = 100;
     }
-    //if (battery != old_battery) {
-    //old_battery = battery;
     bch = true;
     change = true;
-    // }
     if (batteryVoltage != old_batteryVoltage) {
       old_batteryVoltage = batteryVoltage;
       batteryVoltageF = (float)batteryVoltage / 1000;;          // Сonversion to volts
@@ -1682,34 +1676,10 @@ void batLevSend() {
   if (battery > 100) {
     battery = 100;
   }
-  check =                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            sendBatteryLevel(battery, true);
-  wait(700, C_INTERNAL, I_BATTERY_LEVEL);
+  sendBatteryLevel(battery, true);
+  wait(500, C_INTERNAL, I_BATTERY_LEVEL);
+  lqSend();
 
-  if (check == true) {
-    err_delivery_beat = 0;
-    if (flag_nogateway_mode == true) {
-      flag_nogateway_mode = false;
-      CORE_DEBUG(PSTR("MyS: NORMAL GATEWAY MODE\n"));
-      err_delivery_beat = 0;
-    }
-    CORE_DEBUG(PSTR("MyS: SEND BATTERY LEVEL\n"));
-    CORE_DEBUG(PSTR("MyS: BATTERY LEVEL %: %d\n"), battery);
-
-    lqSend();
-
-  } else {
-    _transportSM.failedUplinkTransmissions = 0;
-    if (err_delivery_beat < 6) {
-      err_delivery_beat++;
-    }
-    if (err_delivery_beat == 5) {
-      if (flag_nogateway_mode == false) {
-        happy_node_mode();
-        gateway_fail();
-        CORE_DEBUG(PSTR("MyS: LOST GATEWAY MODE\n"));
-      }
-    }
-  }
   wdt_nrfReset();
 }
 
@@ -1730,9 +1700,6 @@ void lqSend() {
     check = send(sqMsg.set(nRFRSSI));
     if (!check) {
       _transportSM.failedUplinkTransmissions = 0;
-      wait(shortWait * 2);
-      check = send(sqMsg.set(nRFRSSI));
-      _transportSM.failedUplinkTransmissions = 0;
     } else {
       CORE_DEBUG(PSTR("MyS: SEND LINK QUALITY\n"));
       CORE_DEBUG(PSTR("MyS: LINK QUALITY %: %d\n"), nRFRSSI);
@@ -1746,14 +1713,6 @@ void sendBattVoltage() {
   check = send(bvMsg.set(batteryVoltageF, 3));
   if (!check) {
     _transportSM.failedUplinkTransmissions = 0;
-    wait(shortWait * 2);
-    check = send(bvMsg.set(batteryVoltageF, 3));
-    if (!check) {
-      _transportSM.failedUplinkTransmissions = 0;
-      wait(shortWait * 3);
-      check = send(bvMsg.set(batteryVoltageF, 3));
-      wait(shortWait * 3);
-    }
   } else {
     CORE_DEBUG(PSTR("MyS: SEND BATTERY VOLTAGE\n"));
   }
@@ -1797,13 +1756,10 @@ static __INLINE uint8_t battery_level_in_percent(const uint16_t mvolts)
 //####################################### SENSOR DATA ##################################################
 
 void readData() {
-  //wait(20);
   CORE_DEBUG(PSTR("MyS: START READ PWSENSOR\n"));
   msm ();
   CORE_DEBUG(PSTR("MyS: STOP READ PWSENSOR\n"));
   CORE_DEBUG(PSTR("MyS: START READ INT TEMP SENSOR\n"));
-  //hwSleep(500);
-  //wait(20);
   itemp();
   CORE_DEBUG(PSTR("MyS: STOP READ INT TEMP SENSOR\n"));
 }
@@ -1818,19 +1774,10 @@ void sendData() {
       check = send(msgTemp.setDestination(0).set(celsius, 2));
       if (check == false) {
         _transportSM.failedUplinkTransmissions = 0;
-        wait(shortWait * 4);
-        check = send(msgTemp.setDestination(0).set(celsius, 2));
-        if (check == false) {
-          wait(shortWait * 8);
-          _transportSM.failedUplinkTransmissions = 0;
-          check = send(msgTemp.setDestination(0).set(celsius, 2));
-          wait(shortWait * 2);
-        }
-      }
-      if (bindSend == 0) {
+        change = true;
+      } else {
         tch = false;
       }
-
       if (check == true) {
         err_delivery_beat = 0;
         if (flag_nogateway_mode == true) {
@@ -1855,20 +1802,13 @@ void sendData() {
       }
     }
 
+
     if (hch == true) {
       check = send(msgHum.setDestination(0).set(readyCalcSend, 0));
       if (check == false) {
         _transportSM.failedUplinkTransmissions = 0;
-        wait(shortWait * 4);
-        check = send(msgHum.setDestination(0).set(readyCalcSend, 0));
-        if (check == false) {
-          wait(shortWait * 8);
-          _transportSM.failedUplinkTransmissions = 0;
-          check = send(msgHum.setDestination(0).set(readyCalcSend, 0));
-          wait(shortWait * 2);
-        }
-      }
-      if (bindSend == 0) {
+        change = true;
+      } else {
         hch = false;
       }
 
@@ -1908,42 +1848,6 @@ void sendData() {
 
     transportDisable();
   } else {
-    if (bindSend > 0) {
-      transportReInitialise();
-      if (tch == true) {
-        check = send(msgTemp.setDestination(bindSend).set(celsius, 2));
-        if (check == false) {
-          _transportSM.failedUplinkTransmissions = 0;
-          wait(shortWait * 2);
-          check = send(msgTemp.setDestination(bindSend).set(celsius, 2));
-          if (check == false) {
-            wait(shortWait * 4);
-            _transportSM.failedUplinkTransmissions = 0;
-            check = send(msgTemp.setDestination(bindSend).set(celsius, 2));
-            wait(shortWait * 2);
-          }
-        }
-        tch = false;
-      }
-
-      if (hch == true) {
-        check = send(msgHum.setDestination(bindSend).set(readyCalcSend, 0));
-        if (check == false) {
-          _transportSM.failedUplinkTransmissions = 0;
-          wait(shortWait * 2);
-          check = send(msgHum.setDestination(bindSend).set(readyCalcSend, 0));
-          if (check == false) {
-            wait(shortWait * 4);
-            _transportSM.failedUplinkTransmissions = 0;
-            check = send(msgHum.setDestination(bindSend).set(readyCalcSend, 0));
-            wait(shortWait * 2);
-          }
-        }
-        hch = false;
-      }
-      transportDisable();
-    }
-
     tch = false;
     hch = false;
     bch = false;
@@ -2004,7 +1908,7 @@ void sendConfig() {
     wait(shortWait * 2);
     _transportSM.failedUplinkTransmissions = 0;
   }
-
+/*
   check = send(setBind.set(bindSend));
   if (check == false) {
     _transportSM.failedUplinkTransmissions = 0;
@@ -2013,7 +1917,7 @@ void sendConfig() {
     wait(shortWait * 2);
     _transportSM.failedUplinkTransmissions = 0;
   }
-
+*/
   check = send(setThreshHum.set(threshholdHum));
   if (check == false) {
     _transportSM.failedUplinkTransmissions = 0;
@@ -2126,6 +2030,10 @@ void receive(const MyMessage & message)
         if (threshholdHum > 99) {
           threshholdHum = 99;
         }
+        if (threshholdHum == 0) {
+          threshholdHum = 1;
+        }
+
         saveState(109, threshholdHum);
         wait(shortWait);
         send(setThreshHum.set(threshholdHum));
@@ -2159,7 +2067,7 @@ void receive(const MyMessage & message)
         sleepTimeCount = SLEEP_TIME;
       }
     }
-
+/*
     if (message.sensor == SET_BIND_ID) {
       if (message.type == V_VAR1) {
         bindSend = message.getByte();
@@ -2177,7 +2085,7 @@ void receive(const MyMessage & message)
         sleepTimeCount = SLEEP_TIME;
       }
     }
-
+*/
     if (message.sensor == SET_COLOR_ID) {
       if (message.type == V_VAR1) {
         colorPrint = message.getBool();
@@ -2407,20 +2315,6 @@ void colorChange(bool flag) {
 void before()
 {
   //########################################## CONFIG MCU ###############################################
-#ifdef NRF840
-  if (((NRF_UICR->PSELRESET[0] & UICR_PSELRESET_CONNECT_Msk) != (UICR_PSELRESET_CONNECT_Connected << UICR_PSELRESET_CONNECT_Pos)) ||
-      ((NRF_UICR->PSELRESET[1] & UICR_PSELRESET_CONNECT_Msk) != (UICR_PSELRESET_CONNECT_Connected << UICR_PSELRESET_CONNECT_Pos))) {
-    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
-    while (NRF_NVMC->READY == NVMC_READY_READY_Busy) {}
-    NRF_UICR->PSELRESET[0] = 18;
-    while (NRF_NVMC->READY == NVMC_READY_READY_Busy) {}
-    NRF_UICR->PSELRESET[1] = 18;
-    while (NRF_NVMC->READY == NVMC_READY_READY_Busy) {}
-    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
-    while (NRF_NVMC->READY == NVMC_READY_READY_Busy) {}
-    NVIC_SystemReset();
-  }
-#endif
 
 #ifdef DCPOWER
   NRF_POWER->DCDCEN = 1;
@@ -2473,8 +2367,8 @@ void before()
   //timeSend = 1; // для теста, 1 минута
 
   threshholdHum = loadState(109);  // сохранение в памяти интервала отправки данных с сенсора sht/si, максимано 60 минут, если 0 то отправку не делает, только обновляет инфо на экране
-  if (threshholdHum > 99) {
-    threshholdHum = 99;
+  if (threshholdHum == 255 || threshholdHum == 0) {
+    threshholdHum = 40;
     saveState(109, threshholdHum);
   }
 
@@ -2498,14 +2392,14 @@ void before()
   }
   altfont = loadState(107);
   //altfont = true;// для теста, true или false
-
+/*
   bindSend = loadState(108);
   if (bindSend > 254) {
     bindSend = 0;
     saveState(108, bindSend);
   }
   //bindSend = 100; // id 100
-
+*/
   timeConf();
 
   //########################################## EINK INIT ###############################################
@@ -2514,7 +2408,18 @@ void before()
   paith.Clear(opposite_colorPrint);
   DrawImageWH(&paith, 0, 0, LOGO, 80, 128, colorPrint);
   EPD_Display_Image((UBYTE *)image_temp);
-  EINK_Delay_ms(2000);
+  hwSleep(2000);
+
+#ifdef ESPECIALLY
+  //EPD_Clear();
+  EPD_Clear();
+  EPD_Part_Init();
+  paith.Clear(opposite_colorPrint);
+  DrawImageWH(&paith, 0, 0, Especially, 80, 128, colorPrint);
+  EPD_Display_Image((UBYTE *)image_temp);
+  hwSleep(2500);
+#endif
+
   EPD_Clear();
   EPD_Part_Init();
   paith.Clear(opposite_colorPrint);
@@ -2621,7 +2526,7 @@ void presentation()
     wait(shortWait * 2);
     _transportSM.failedUplinkTransmissions = 0;
   }
-
+/*
   check = present(SET_BIND_ID, S_CUSTOM, "MASTER DEVICE ID");
   if (!check) {
     _transportSM.failedUplinkTransmissions = 0;
@@ -2630,7 +2535,7 @@ void presentation()
     wait(shortWait * 2);
     _transportSM.failedUplinkTransmissions = 0;
   }
-
+*/
   check = present(SET_THRESHOLD_HUM_ID, S_CUSTOM, "NOTIFICATION OF IRRIGATION");
   if (!check) {
     _transportSM.failedUplinkTransmissions = 0;
@@ -2690,7 +2595,7 @@ void loop() {
           }
 
           if (digitalRead(PIN_BUTTON) == LOW && button_flag == true) {
-            if ((millis() - previousMillis > 0) && (millis() - previousMillis <= 5500)) {
+            if ((millis() - previousMillis > 1500) && (millis() - previousMillis <= 5500)) {
               if (updateink1 == false) {
                 einkZeropush();
                 updateink1 = true;
@@ -2720,26 +2625,12 @@ void loop() {
             }
             if ((millis() - previousMillis > 10500) && (millis() - previousMillis <= 13500)) {
               if (updateink3 == false) {
-                einkOnePluspush();
+                einkTwopush();
                 updateink3 = true;
                 updateinkclear = false;
               }
             }
-            if ((millis() - previousMillis > 13500) && (millis() - previousMillis <= 14500)) {
-              if (updateinkclear == false) {
-                EPD_Clear3();
-                updateinkclear = true;
-              }
-
-            }
-            if ((millis() - previousMillis > 14500) && (millis() - previousMillis <= 17500)) {
-              if (updateink4 == false) {
-                einkTwopush();
-                updateink4 = true;
-                updateinkclear = false;
-              }
-            }
-            if (millis() - previousMillis > 17500) {
+            if (millis() - previousMillis > 13500) {
               if (updateinkclear == false) {
                 EPD_Clear3();
                 updateinkclear = true;
@@ -2750,7 +2641,7 @@ void loop() {
 
           if (digitalRead(PIN_BUTTON) == HIGH && button_flag == true) {
 
-            if ((millis() - previousMillis <= 5500) && (button_flag == true))
+            if ((millis() - previousMillis > 1500 && millis() - previousMillis <= 5500) && button_flag == true)
             {
               wdt_nrfReset();
               einkZeroend();
@@ -2776,28 +2667,13 @@ void loop() {
               wait(shortWait);
               configMillis = millis();
             }
+            
             if ((millis() - previousMillis > 10500) && (millis() - previousMillis <= 13500) && (button_flag == true))
-            {
-              wdt_nrfReset();
-              einkOnePlusend();
-              wait(shortWait * 30);
-              reseteinkset();
-              // упрощенная привязка через контроллер, используется режим конфигурации
-              configMode = true;
-              button_flag = false;
-              buttIntStatus = 0;
-              transportReInitialise();
-              wait(shortWait);
-              NRF5_ESB_startListening();
-              wait(shortWait);
-              configMillis = millis();
-            }
-            if ((millis() - previousMillis > 14500) && (millis() - previousMillis <= 17500) && (button_flag == true))
             {
               einkTwoend();
               new_device();
             }
-            if ((((millis() - previousMillis > 5500) && (millis() - previousMillis <= 6500)) || ((millis() - previousMillis > 9500) && (millis() - previousMillis <= 10500)) || ((millis() - previousMillis > 13500) && (millis() - previousMillis <= 14500)) || (millis() - previousMillis > 17500) ) && (button_flag == true))
+            if (((millis() - previousMillis < 1500) || ((millis() - previousMillis > 5500) && (millis() - previousMillis <= 6500)) || ((millis() - previousMillis > 9500) && (millis() - previousMillis <= 10500)) || (millis() - previousMillis > 13500) ) && (button_flag == true))
             {
               wdt_nrfReset();
               change = true;
@@ -2825,7 +2701,7 @@ void loop() {
               sendData();
               wait(shortWait);
               EPD_Part_Init();
-              wait(shortWait*2);
+              wait(shortWait * 2);
               convert(celsius, readyCalc);
               wait(shortWait);
               EPD_Sleep();
@@ -2853,7 +2729,7 @@ void loop() {
         }
 
         if (digitalRead(PIN_BUTTON) == LOW && button_flag == true) {
-          if ((millis() - previousMillis > 0) && (millis() - previousMillis <= 5500)) {
+          if ((millis() - previousMillis > 1500) && (millis() - previousMillis <= 5500)) {
             if (updateink1 == false) {
               EPD_Part_Init();
               einkZeropush();
@@ -2868,25 +2744,12 @@ void loop() {
           }
           if ((millis() - previousMillis > 6500) && (millis() - previousMillis <= 9500)) {
             if (updateink2 == false) {
-              einkOnePluspush();
+              einkTwopush();
               updateink2 = true;
               updateinkclear = false;
             }
           }
-          if ((millis() - previousMillis > 9500) && (millis() - previousMillis <= 10500)) {
-            if (updateinkclear == false) {
-              EPD_Clear3();
-              updateinkclear = true;
-            }
-          }
-          if ((millis() - previousMillis > 10500) && (millis() - previousMillis <= 13500)) {
-            if (updateink3 == false) {
-              einkTwopush();
-              updateink3 = true;
-              updateinkclear = false;
-            }
-          }
-          if (millis() - previousMillis > 13500) {
+          if (millis() - previousMillis > 9500) {
             if (updateinkclear == false) {
               EPD_Clear3();
               updateinkclear = true;
@@ -2896,7 +2759,7 @@ void loop() {
         }
 
         if (digitalRead(PIN_BUTTON) == HIGH && button_flag == true) {
-          if (millis() - previousMillis <= 5500 && button_flag == true)
+          if ((millis() - previousMillis > 1500 && millis() - previousMillis <= 5500) && button_flag == true)
           {
             einkZeroend();
             reseteinkset();
@@ -2908,23 +2771,13 @@ void loop() {
             change = true;
             sleepTimeCount = SLEEP_TIME;
           }
+        
           if ((millis() - previousMillis > 6500) && (millis() - previousMillis <= 9500) && (button_flag == true))
-          {
-            // в состоянии - без сети неиспользуется, тк упрощенная привязка через контроллер(заглушка)
-            einkOnePlusend();
-            wait(shortWait * 30);
-            reseteinkset();
-            button_flag = false;
-            buttIntStatus = 0;
-            change = true;
-            sleepTimeCount = SLEEP_TIME;
-          }
-          if ((millis() - previousMillis > 10500) && (millis() - previousMillis <= 13500) && (button_flag == true))
           {
             einkTwoend();
             new_device();
           }
-          if ( ( ( millis() - previousMillis > 5500 && millis() - previousMillis <= 6500 ) || ( millis() - previousMillis > 9500 && millis() - previousMillis <= 10500 ) || (millis() - previousMillis > 13500)) && button_flag == true)
+          if ((millis() - previousMillis < 1500) ||  ( ( millis() - previousMillis > 5500 && millis() - previousMillis <= 6500 ) || (millis() - previousMillis > 9500)) && button_flag == true)
           {
             change = true;
             sleepTimeCount = SLEEP_TIME;
@@ -3004,6 +2857,7 @@ void loop() {
   wdt_nrfReset();
 }
 
+
 static __INLINE void wdt_init(void)
 {
   NRF_WDT->CONFIG = (WDT_CONFIG_HALT_Pause << WDT_CONFIG_HALT_Pos) | ( WDT_CONFIG_SLEEP_Run << WDT_CONFIG_SLEEP_Pos);
@@ -3015,6 +2869,7 @@ static __INLINE void wdt_init(void)
 static __INLINE void wdt_nrfReset() {
   NRF_WDT->RR[0] = WDT_RR_RR_Reload;
 }
+
 
 void itemp() {
   for (byte i = 0; i < 9; i++) {
@@ -3036,9 +2891,12 @@ void itemp() {
 }
 
 void msm () {
-  wait(10);
   digitalWrite(PIN_POWER_PWS, LOW);                           // Turning on the power of the soil moisture meter
-  wait(60);                                                  // Wait
+  hwSleep(1000);  // Wait
+  wait(100);
+  readBatt();
+  CORE_DEBUG(PSTR("MyS: SENSOR DEBAG START\n"));
+  CORE_DEBUG(PSTR("MyS: BatteryVoltage 1 = %d\n"), batteryVoltage);
   uint16_t m_s_m = 0;
   uint16_t m_s_m2 = 0;
   for (byte i = 0; i < 5; i++) {
@@ -3046,42 +2904,32 @@ void msm () {
     CORE_DEBUG(PSTR("MyS: m_s_m = %d\n"), m_s_m);
     m_s_m2 = m_s_m2 + m_s_m;
     CORE_DEBUG(PSTR("MyS: m_s_m2 = %d\n"), m_s_m2);
-    wait(5);
+    wait(30);
   }
   m_s_m = m_s_m2 / 5;
-  // Read analog data from sensor
-  readBatt();
   digitalWrite(PIN_POWER_PWS, HIGH);                          // Turning off the power of the soil moisture meter
 
-  if (firstLoop == false) {                                   // Assigning a variable to filter the initial value
-    firstLoop = true;
-    filtered_m_s_m = (float)m_s_m;
-  }
-  filtered_m_s_m += ((float)m_s_m - filtered_m_s_m) * 0.9;
-  uint16_t ready_m_s_m = ceil(filtered_m_s_m);
+  uint16_t ready_m_s_m = m_s_m;
 
   if (batteryVoltage > nomV) {
     batteryVoltage = nomV;
   }
   differenceV = nomV - batteryVoltage;
-  differenceAD = (float)differenceV * 0.182926;
-  maxiM = maxi - round(differenceAD);
-  miniM = mini + round(differenceAD);
+  differenceAD1 = (float)differenceV * 1.3;
+  differenceAD2 = (float)differenceV * 0.8;
+  maxiM = maxi - round(differenceAD1);
+  miniM = mini - round(differenceAD2);
 
   if (ready_m_s_m <= maxiM) {
-    m_s_m_calc = map(ready_m_s_m, miniM, maxiM, 99, 1);
+    m_s_m_calc = map(ready_m_s_m, miniM, maxiM, 99, 0);
     if (m_s_m_calc > 99) {
       m_s_m_calc = 99;
     }
   } else {
     m_s_m_calc = 0;
   }
-  if (firstLoop2 == false) {
-    firstLoop2 = true;
-    filtered_m_s_m_calc = m_s_m_calc;
-  }
-  filtered_m_s_m_calc += ((float)m_s_m_calc - filtered_m_s_m_calc) * 0.7;
-  readyCalc = (uint16_t)floor(filtered_m_s_m_calc);
+
+  readyCalc = m_s_m_calc;
   if ((readyCalc + 3 > lastReadyCalc) || (readyCalc < lastReadyCalc)) {
     if ((readyCalc - lastReadyCalc) != calcThreshold) {
       if (abs(readyCalc - lastReadyCalc) >= calcThreshold) {
@@ -3092,10 +2940,10 @@ void msm () {
       }
     }
   }
-  CORE_DEBUG(PSTR("MyS: SENSOR DEBAG START\n"));
+
   CORE_DEBUG(PSTR("MyS: maxiM = %d\n"), maxiM);
   CORE_DEBUG(PSTR("MyS: miniM = %d\n"), miniM);
-  CORE_DEBUG(PSTR("MyS: m_s_m = %d\n"), m_s_m33);
+  CORE_DEBUG(PSTR("MyS: m_s_m = %d\n"), m_s_m);
   CORE_DEBUG(PSTR("MyS: ready_m_s_m = %d\n"), ready_m_s_m);
   CORE_DEBUG(PSTR("MyS: m_s_m_calc = %d\n"), m_s_m_calc);
   CORE_DEBUG(PSTR("MyS: readyCalc = %d\n"), readyCalc);
